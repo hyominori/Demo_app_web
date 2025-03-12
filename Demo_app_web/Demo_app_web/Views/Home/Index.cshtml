@@ -1,0 +1,112 @@
+﻿@model IEnumerable<Demo_app_web.Models.User>
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">
+        @ViewBag.Welcome
+    </h1>
+    <h1>
+        @if(ViewBag.IsLogin == 1)
+        {
+            <span>
+                You are logged in
+            </span>
+        }else
+        {
+            <span>
+                You are not logged in
+            </span>
+        }
+    </h1>
+
+    <form asp-action="Login" asp-controller="Home" method="post">
+		<input required type="text" id="username" name="Username" value="" placeholder="Username" />
+		<input required type="password" id="password" name="Password" value="" placeholder="Password" />
+		<button type="submit">Login</button>    
+    </form>
+
+	<form asp-action="AddUser" asp-controller="Home" method="post" id="form_create">
+		@Html.AntiForgeryToken()
+		<input required type="text" id="username" name="Username" value="" placeholder="Username"/>
+        <input required type="email" id="email" name="Email" value="" placeholder="Email"/>
+        <input required type="password" id="password" name="Password" value="" placeholder="Password"/>
+        <button type="submit">Add</button>
+    </form>
+
+	<form asp-action="UpdateUser" asp-controller="Home" method="post" id="form_update" style="display:none;">
+        @Html.AntiForgeryToken()
+		<input type="number" id="form_update_user_id" name="Id" value="" style="display:none"/>
+        <input required type="text" id="form_update_username" name="Username" value="" placeholder="Username" />
+        <input required type="email" id="form_update_email" name="Email" value="" placeholder="Email" />
+        <input required type="password" id="form_update_password" name="Password" value="" placeholder="Password" />
+        <button type="submit">Update</button>
+        <button type="button" onclick="backToAdd()">Back to Add</button>
+    </form>
+
+    <hr/>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>UserName</th>
+                <th>Email</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var user in Model)
+            {
+				<tr>
+					<td>@user.Id</td>
+					<td>@user.Username</td>
+					<td>@user.Email</td>
+                    <td> 
+                        <button onclick="deleteUser(@user.Id, '@user.Username')">
+                            Delete
+                        </button>
+                        <button onclick="updateUser(@user.Id, '@user.Username', '@user.Email', '@user.Password')">
+                            Update
+                        </button>
+                    </td>
+				</tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@section Scripts {
+    <script>
+        function deleteUser(id, username){
+           // console.log("ID "+id); //--------check data flow---------
+           // console.log("Username "+username);
+            if(confirm("Are you sure you want to delete" + username + "?")){
+                    window.location.href = "/Home/DeleteUser/" + id;
+            }
+        }
+
+        function updateUser(id, username, email, password){
+			document.getElementById("form_update_user_id".valueOf()).value = id;
+			document.getElementById("form_update_username".valueOf()).value = username;
+			document.getElementById("form_update_email".valueOf()).value = email;
+			document.getElementById("form_update_password".valueOf()).value = password;
+            document.getElementById("form_update").style.display = "block";
+            document.getElementById("form_create").style.display = "none";
+
+           
+
+			// if(confirm("Are you sure you want to update" + username + "?")){
+			// 		window.location.href = "/Home/UpdateUser/" + id;
+			// }
+        }
+
+		function backToAdd(){
+			document.getElementById("form_update").style.display = "none";
+			document.getElementById("form_create").style.display = "block";
+		}
+    </script>
+}
+
+
